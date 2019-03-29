@@ -1,0 +1,104 @@
+<html>
+    <head>
+        <style>
+            #userInput{
+                width: 300px;
+                height: 31px;
+                font-size: 17px;
+                outline: none;
+            }
+            #submitButton{
+                background: #0078ff;
+                padding: 5px 10px;
+                border-radius: 3px;
+                font-size: 12px;
+                color: #fff;
+                vertical-align: top;
+                outline: none;
+                cursor: pointer;
+            }
+            #uniqueValues, #dupValues, #exsValues{
+                word-wrap: break-word;
+                font-family: monospace;
+            } 
+            #uniqueVal span, #duplicateVal span, #existingVal span{
+                font-weight: bold;
+            }
+
+        </style>  
+    </head>
+    <body>
+        <input type="text" id="userInput"/>
+        <button id="submitButton">Find Duplicate and Unique Value</button>
+        
+        <div id="existingVal">
+            <span>Existing Array :</span>
+            <p id="exsValues">[1,4,5,6,12,45,56,34]</p>
+        </div>
+        <div id="duplicateVal">
+            <span>Duplicate Values :</span>
+            <p id="dupValues"></p>
+        </div>
+        <div id="uniqueVal">
+            <span>Final List :</span>
+            <p id="uniqueValues"></p>
+        </div>
+        <script>
+            //Duplicate Values ---->
+            // If user try to enter the duplicate values in the textbox
+            // i.e 1,2,3,4,10,6-11
+            // Here 10 is typed and that comes under the 6-11 range
+            // So 10 will be consider as a duplicate
+            // and that duplicate value show only once in the deuplicate value list
+
+            // Invalid Input -----> 
+            // 3-5-1, 5-y, 3*3-5*1 will be consider as not a valid input, so we will skip
+
+            // Valid input ----->
+            // " 50-60" and "50- 60" (space between the range) will be consider as the "50-60"
+            // "50-60" and "60-50" will be consider as "50-60"
+            window.onload = function(){
+                function convertFullArray(currentVal) { //Convert input to a array
+                    var outputArr = [], 
+                        len = currentVal.length - 1;    //get input value array length
+                    for(var i = 0; i <= len; i++){
+                        if(currentVal[i].indexOf('-') > -1){   // Hangle Range input: Check whether the typed value have range or not i.e "6-10". "6-10" and "10-6" will be consider as same
+                            var latestVal = currentVal[i].trim(),
+                                startEndVal = latestVal.split('-').sort(function (a, b) { return a - b; }),
+                                firstVal = parseInt(startEndVal[0].trim()), //trim value if user give input like " 50-60" or "50- 60"
+                                lastVal = parseInt(startEndVal[1].trim());
+                            if(startEndVal.length == 2 && typeof firstVal == 'number' && typeof lastVal == 'number' && firstVal.toString().length == startEndVal[0].trim().length && lastVal.toString().length == startEndVal[1].trim().length){
+                                for(var j = firstVal; j <= lastVal; j++){
+                                    outputArr.push(j);
+                                }
+                            }
+                        }else if(parseInt(currentVal[i])){      // Hangle normal input: i.e "1,2,3"
+                            outputArr.push(parseInt(currentVal[i]));
+                        }
+                    }
+                    return outputArr;
+                }
+                document.getElementById("submitButton").onclick = function() {
+                    var existingArray = [1,4,5,6,12,45,56,34],
+                        inputValue = document.getElementById('userInput').value,    //get value from inputbox
+                        inputArray = inputValue.split(','), // convert input value to array from string
+                        finalArray = convertFullArray(inputArray),
+                        duplicateArr = [];
+                    if(inputValue != ""){
+                        finalArray.map(function(val, key){  //Filter duplicate and unique value
+                            if(existingArray.indexOf(val) == -1){
+                                existingArray.push(val);
+                            }else{
+                                duplicateArr.push(val);
+                            }
+                        });
+                        document.getElementById("uniqueValues").innerHTML = existingArray.length ? existingArray : "NO UNIQUE VALUES FOUND";
+                        document.getElementById("dupValues").innerHTML = duplicateArr.length ? Array.from(new Set(duplicateArr)) : "NO DUPLICATE VALUES FOUND!!";
+                    }else{
+                        alert("Please give some input in the textbox.");
+                    }
+                }
+            }
+        </script>
+    </body>
+</html>
